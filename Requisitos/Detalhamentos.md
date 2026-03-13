@@ -1,0 +1,13 @@
+| Módulo         | Resumo                                         | Prioridade | Impacto Negócios                     | Ordem Desenvolvimento | # Histórias | Esforço Estimado | Dependências           |
+| -------------- | ---------------------------------------------- | ---------- | ------------------------------------ | --------------------- | ----------- | ---------------- | ---------------------- |
+| Autenticação   | Login seguro, recuperação senha, RBAC          | Crítica    | 🔴 Alto - sem isso não funciona      | 1º                    | 3           | 3M               | -                      |
+| Contatos       | CRUD completo de pessoas físicas/prospects     | Alta       | 🔴 Alto - coração do CRM             | 2º                    | 3           | 3M               | Autenticação           |
+| Contas         | Gestão de empresas e hierarquia organizacional | Alta       | 🟡 Médio - essencial para B2B        | 3º                    | 2           | 2M               | Contatos               |
+| Oportunidades  | Registro e acompanhamento de vendas potenciais | Crítica    | 🔴 Alto - principal KPI              | 4º                    | 4           | 4M               | Contatos+Contas        |
+| Pipeline       | Visualização Kanban e movimentação de deals    | Crítica    | 🔴 Alto - gestão visual do funil     | 5º                    | 2           | 2G               | Oportunidades          |
+| Atividades     | Registro de calls, reuniões, follow-ups        | Alta       | 🔴 Alto - histórico de interações    | 6º                    | 2           | 2M               | Contatos               |
+| Relatórios     | Dashboards e análises de performance           | Alta       | 🟡 Médio - gestão por números        | 7º                    | 3           | 3G               | Oportunidades+Pipeline |
+| Administração  | Configurações de campos, funis, integrações    | Média      | 🟢 Baixo - mas essencial para adoção | 8º                    | 3           | 3G               | Todos anteriores       |
+| Marketing      | Importação massa, segmentação, email marketing | Média      | 🟢 Baixo - diferencial competitivo   | 9º                    | 3           | 3G               | Contatos               |
+| Suporte        | Gestão de tickets/casos de atendimento         | Baixa      | 🟢 Baixo - expande escopo            | 10º                   | 2           | 2G               | Contatos               |
+| Não-funcionais | Performance, segurança, auditoria              | Crítica    | 🔴 Alto - garante escalabilidade     | Contínua              | 3           | 3G               | Todos                  |
