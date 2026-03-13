@@ -1,0 +1,103 @@
+# docker-compose.override.yml
+#
+# Este arquivo é carregado AUTOMATICAMENTE pelo Docker Compose em conjunto
+# com docker-compose.yml. Não é necessário nenhuma flag extra.
+#
+# Propósito: configurações exclusivas de desenvolvimento local.
+# NÃO deve ser commitado em ambientes de produção/staging.
+#
+# Uso:
+#   docker compose up --build    ← sobe com este override automaticamente
+#   docker compose up -d         ← em background
+#   docker compose logs -f app   ← acompanhar logs
+
+services:
+
+  # ──────────────────────────────────────────────────────────────
+  # Aplicação — overrides de desenvolvimento
+  # ──────────────────────────────────────────────────────────────
+  app:
+    # Sem restart automático em dev (facilita parar durante depuração)
+    restart: "no"
+
+    environment:
+      # Sobrescreve valores do .env para garantir modo dev
+      APP_ENV: development
+      DEBUG: "true"
+
+      # Servidor de e-mail aponta para o Mailpit local
+      # (ter disponível quando o envio de e-mail for implementado)
+      MAIL_SERVER: mailpit
+      MAIL_PORT: "1025"
+      MAIL_USE_TLS: "false"
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+
+    volumes:
+      # Monta o projeto inteiro para hot reload em qualquer arquivo
+      # (inclui alembic/, pyproject.toml, .env, etc.)
+      - .:/app
+      # Volume nomeado para preservar o .venv instalado na imagem
+      # Evita que o mount acima sobrescreva as dependências instaladas
+      - venv_dev:/app/.venv
+
+    # Garante que uma mudança em qualquer .py reinicia o servidor
+    command: >
+      sh -c "
+        echo '>>> Aguardando banco de dados...' &&
+        alembic upgrade head &&
+        echo '>>> Migrações aplicadas. Iniciando API...' &&
+        uvicorn app.main:app
+          --host 0.0.0.0
+          --port 8000
+          --reload
+          --reload-dir /app/app
+          --log-level debug
+      "
+
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  # ──────────────────────────────────────────────────────────────
+  # PostgreSQL — sem restart em dev
+  # ──────────────────────────────────────────────────────────────
+  db:
+    restart: "no"
+
+  # ──────────────────────────────────────────────────────────────
+  # pgAdmin — sem restart em dev
+  # ──────────────────────────────────────────────────────────────
+  pgadmin:
+    restart: "no"
+
+  # ──────────────────────────────────────────────────────────────
+  # Mailpit — servidor SMTP local para testar e-mails
+  #
+  # Captura todos os e-mails enviados pela aplicação e exibe
+  # em interface web sem enviá-los de fato.
+  #
+  # Web UI: http://localhost:8025
+  # SMTP:   localhost:1025
+  # ──────────────────────────────────────────────────────────────
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: crm_mailpit
+    restart: "no"
+    ports:
+      - "1025:1025"   # SMTP (aplicação envia para cá)
+      - "8025:8025"   # Interface web de inspeção
+    environment:
+      MP_MAX_MESSAGES: 500          # Manter no máximo 500 mensagens
+      MP_SMTP_AUTH_ACCEPT_ANY: 1    # Aceita qualquer usuário/senha
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - crm_network
+
+volumes:
+  venv_dev:
+    # Volume isolado para o .venv do container de desenvolvimento.
+    # Persiste as dependências entre restarts sem interferir na
+    # árvore de arquivos local.
