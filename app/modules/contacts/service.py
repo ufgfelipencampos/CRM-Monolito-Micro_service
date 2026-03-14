@@ -124,6 +124,7 @@ class ContactService:
 
         contact.updated_by = updater_id
         await self.db.flush()
+        await self.db.refresh(contact)
 
         await self.audit.log(
             entity_type="contact",

@@ -239,6 +239,7 @@ class OpportunityService:
 
         opp.updated_by = updater_id
         await self.db.flush()
+        await self.db.refresh(opp)
         await self.audit.log(
             entity_type="opportunity",
             entity_id=opp.id,
