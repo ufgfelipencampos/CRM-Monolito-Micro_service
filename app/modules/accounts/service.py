@@ -150,6 +150,7 @@ class AccountService:
 
         account.updated_by = updater_id
         await self.db.flush()
+        await self.db.refresh(account)
 
         await self.audit.log(
             entity_type="account",

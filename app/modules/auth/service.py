@@ -190,6 +190,8 @@ class AuthService:
                 select(Role).where(Role.id.in_(data.role_ids), Role.is_active == True)
             )
             user.roles = list(roles_result.scalars().all())
+        else:
+            user.roles = []
 
         self.db.add(user)
         await self.db.flush()
@@ -242,6 +244,7 @@ class AuthService:
             user.roles = list(roles_result.scalars().all())
 
         await self.db.flush()
+        await self.db.refresh(user)
         await self.audit.log(
             entity_type="user",
             entity_id=user.id,
@@ -342,6 +345,7 @@ class AuthService:
             ]
 
         await self.db.flush()
+        await self.db.refresh(role)
         await self.audit.log(
             entity_type="role",
             entity_id=role.id,

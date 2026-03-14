@@ -100,13 +100,13 @@ async def _seed_initial_data():
                 await auth.create_user(
                     UserCreate(
                         name="Administrador",
-                        email="admin@crm.local",
+                        email="admin@crmapp.com",
                         password="Admin@1234",
                         role_ids=admin_role_id,
                     )
                 )
                 logger.info(
-                    "Usuário admin padrão criado: admin@crm.local / Admin@1234 "
+                    "Usuário admin padrão criado: admin@crmapp.com / Admin@1234 "
                     "— TROQUE A SENHA em produção!"
                 )
 
